@@ -7,7 +7,18 @@ import {
   getReaderSettings,
 } from "@/lib/content";
 import { formatDate, calculateReadingStats } from "@examblog/shared";
-import { ArrowRight, Flame, Eye, Clock, Folder } from "lucide-react";
+import { HomeFeedExplorer } from "@/components/home-feed-explorer";
+import { getCategoryLabel } from "@/lib/category-utils";
+import { BookmarkButton } from "@/components/bookmarks-provider";
+import {
+  ArrowRight,
+  Flame,
+  Eye,
+  Clock,
+  Folder,
+  Sparkles,
+  BookOpen,
+} from "lucide-react";
 
 async function HomeFeedContent() {
   const draft = await draftMode();
@@ -18,190 +29,191 @@ async function HomeFeedContent() {
   ]);
 
   const featuredPost = posts.find((p) => p.featured) || posts[0];
-  const restPosts = posts.filter((p) => p.id !== featuredPost?.id);
   const trending = [...posts].sort((a, b) => b.views - a.views).slice(0, 4);
 
   return (
-    <div className="space-y-12">
-      {/* Editorial Hero Banner */}
-      <section className="space-y-3 border-b border-zinc-200/80 pb-8">
-        <div className="inline-flex items-center gap-2 rounded-full border border-zinc-200 bg-white px-3 py-1 text-[11px] font-mono text-zinc-600 shadow-2xs">
-          <span>{settings.siteName} Editorial</span>
-          <span>·</span>
-          <span>Next.js 16 App Router</span>
-        </div>
-        <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-zinc-900">
-          {settings.tagline}
-        </h1>
-        <p className="text-[15px] text-zinc-600 max-w-2xl leading-relaxed">
-          {settings.defaultSeoDescription}
-        </p>
-      </section>
-
-      {/* Featured Lead Story */}
+    <div className="space-y-10">
+      {/* Featured Hero Story Card */}
       {featuredPost && (
-        <section className="rounded-3xl border border-zinc-200/90 bg-white p-7 sm:p-10 shadow-2xs space-y-5">
-          <div className="flex flex-wrap items-center gap-2.5 text-[12px]">
-            <span className="rounded-full bg-zinc-900 text-white px-3 py-0.5 font-medium">
-              บทความแนะนำ (Featured)
-            </span>
-            {featuredPost.status !== "published" && (
-              <span className="rounded-full bg-amber-100 text-amber-800 px-2.5 py-0.5 font-mono text-[11px]">
-                DRAFT PREVIEW
-              </span>
-            )}
-            <Link
-              href={`/category/${featuredPost.categorySlug}`}
-              className="font-mono text-zinc-500 hover:text-zinc-900"
-            >
-              /{featuredPost.categorySlug}
-            </Link>
-            <span className="text-zinc-300">·</span>
-            <span className="text-zinc-500 flex items-center gap-1">
-              <Clock className="w-3.5 h-3.5" />
-              อ่าน {calculateReadingStats(featuredPost.content).minutes} นาที
-            </span>
-          </div>
+        <section className="relative overflow-hidden rounded-3xl border border-indigo-100 bg-gradient-to-br from-white via-indigo-50/35 to-violet-50/40 p-6 sm:p-10 shadow-xs">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
+            <div className="space-y-4 max-w-3xl">
+              <div className="flex flex-wrap items-center gap-2.5 text-[12.5px]">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-indigo-600 text-white px-3 py-1 font-semibold shadow-2xs">
+                  <Sparkles className="w-3.5 h-3.5" />
+                  <span>บทความแนะนำประจำสัปดาห์</span>
+                </span>
+                {featuredPost.status !== "published" && (
+                  <span className="rounded-full bg-amber-100 text-amber-800 px-2.5 py-0.5 font-mono text-[11px] font-semibold">
+                    DRAFT PREVIEW
+                  </span>
+                )}
+                <Link
+                  href={`/category/${featuredPost.categorySlug}`}
+                  className="rounded-full border border-indigo-200 bg-white px-3 py-0.5 font-semibold text-indigo-700 hover:bg-indigo-50 transition"
+                >
+                  {getCategoryLabel(featuredPost.categorySlug, categories)}
+                </Link>
+                <span className="text-slate-300">·</span>
+                <span className="text-slate-600 inline-flex items-center gap-1 font-medium">
+                  <Clock className="w-3.5 h-3.5 text-indigo-500" />
+                  อ่านจบใน {calculateReadingStats(featuredPost.content).minutes} นาที
+                </span>
+              </div>
 
-          <div className="space-y-3 max-w-3xl">
-            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-zinc-900 leading-snug">
-              <Link
-                href={`/blog/${featuredPost.slug}`}
-                className="hover:underline"
-              >
-                {featuredPost.title}
-              </Link>
-            </h2>
-            <p className="text-[15px] text-zinc-600 leading-relaxed">
-              {featuredPost.excerpt}
-            </p>
-          </div>
+              <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight text-slate-900 leading-tight">
+                <Link
+                  href={`/blog/${featuredPost.slug}`}
+                  className="hover:text-indigo-600 transition"
+                >
+                  {featuredPost.title}
+                </Link>
+              </h1>
 
-          <div className="flex flex-wrap items-center justify-between gap-4 pt-3 border-t border-zinc-100 text-[12px] text-zinc-500">
-            <div className="flex items-center gap-3">
-              <span className="font-medium text-zinc-900">
-                โดย {featuredPost.author}
-              </span>
-              <span>·</span>
-              <span>{formatDate(featuredPost.updatedAt)}</span>
-              <span>·</span>
-              <span className="inline-flex items-center gap-1">
-                <Eye className="w-3.5 h-3.5" />
-                {featuredPost.views.toLocaleString()} ครั้ง
-              </span>
+              <p className="text-[15.5px] text-slate-600 leading-relaxed">
+                {featuredPost.excerpt}
+              </p>
+
+              <div className="pt-2 flex flex-wrap items-center gap-4">
+                <Link
+                  href={`/blog/${featuredPost.slug}`}
+                  className="inline-flex items-center gap-2 rounded-full bg-slate-900 hover:bg-indigo-600 text-white px-5 py-2.5 text-[13.5px] font-semibold shadow-sm transition"
+                >
+                  <BookOpen className="w-4 h-4" />
+                  <span>อ่านบทความนี้เลย</span>
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+
+                <BookmarkButton
+                  slug={featuredPost.slug}
+                  title={featuredPost.title}
+                />
+
+                <div className="flex items-center gap-2.5 text-[12.5px] text-slate-500 pl-1">
+                  <span>
+                    โดย <strong className="text-slate-800">{featuredPost.author}</strong>
+                  </span>
+                  <span>·</span>
+                  <span>{formatDate(featuredPost.updatedAt)}</span>
+                  <span>·</span>
+                  <span className="inline-flex items-center gap-1">
+                    <Eye className="w-3.5 h-3.5" />
+                    {featuredPost.views.toLocaleString()} ครั้ง
+                  </span>
+                </div>
+              </div>
             </div>
-
-            <Link
-              href={`/blog/${featuredPost.slug}`}
-              className="inline-flex items-center gap-1.5 font-semibold text-zinc-900 hover:underline"
-            >
-              <span>อ่านบทความฉบับเต็ม</span>
-              <ArrowRight className="w-4 h-4" />
-            </Link>
           </div>
         </section>
       )}
 
-      {/* Main Content Grid + Trending & Taxonomy Sidebar */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        <div className="lg:col-span-8 space-y-5">
-          <h3 className="text-sm font-semibold uppercase tracking-wider text-zinc-400">
-            บทความล่าสุด ({restPosts.length})
-          </h3>
-
-          <div className="space-y-4">
-            {restPosts.map((post) => {
-              const stats = calculateReadingStats(post.content);
-              return (
-                <article
-                  key={post.id}
-                  className="rounded-2xl border border-zinc-200/90 bg-white p-6 shadow-2xs space-y-3 hover:border-zinc-300 transition"
-                >
-                  <div className="flex items-center gap-2.5 text-[11px] text-zinc-500">
-                    {post.status !== "published" && (
-                      <span className="rounded bg-amber-100 text-amber-800 px-2 py-0.5 font-mono font-semibold">
-                        DRAFT
-                      </span>
-                    )}
-                    <Link
-                      href={`/category/${post.categorySlug}`}
-                      className="font-mono text-zinc-600 hover:underline"
-                    >
-                      /{post.categorySlug}
-                    </Link>
-                    <span>·</span>
-                    <span>อ่าน {stats.minutes} นาที</span>
-                    <span>·</span>
-                    <span>{formatDate(post.updatedAt)}</span>
-                  </div>
-
-                  <h4 className="text-lg font-bold tracking-tight text-zinc-900">
-                    <Link
-                      href={`/blog/${post.slug}`}
-                      className="hover:underline"
-                    >
-                      {post.title}
-                    </Link>
-                  </h4>
-
-                  <p className="text-[13.5px] text-zinc-600 leading-relaxed line-clamp-2">
-                    {post.excerpt}
-                  </p>
-                </article>
-              );
-            })}
-          </div>
+      {/* Main Content Grid: Interactive Explorer + Sidebar */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        <div className="lg:col-span-8">
+          <HomeFeedExplorer posts={posts} categories={categories} />
         </div>
 
-        {/* Sidebar */}
-        <aside className="lg:col-span-4 space-y-6">
+        {/* Helpful Sidebar */}
+        <aside className="lg:col-span-4 space-y-6 lg:sticky lg:top-24">
           {/* Trending Widget */}
-          <div className="rounded-2xl border border-zinc-200/90 bg-white p-5 shadow-2xs space-y-4">
-            <div className="flex items-center gap-2 text-[13px] font-semibold text-zinc-900 border-b border-zinc-100 pb-3">
-              <Flame className="w-4 h-4 text-amber-500" />
-              <span>บทความยอดนิยม (Trending)</span>
+          <div className="rounded-2xl border border-slate-200/90 bg-white p-5 shadow-2xs space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div className="flex items-center gap-2 text-[14px] font-bold text-slate-900">
+                <Flame className="w-4 h-4 text-amber-500 fill-amber-500" />
+                <span>บทความยอดฮิตติดอันดับ</span>
+              </div>
+              <span className="text-[11px] font-medium text-slate-400">
+                Most Read
+              </span>
             </div>
 
             <div className="space-y-3.5">
               {trending.map((post, idx) => (
-                <div key={post.id} className="flex items-start gap-3">
-                  <span className="font-mono text-xs font-bold text-zinc-300 pt-0.5">
-                    0{idx + 1}
+                <Link
+                  key={post.id}
+                  href={`/blog/${post.slug}`}
+                  className="group flex items-start gap-3.5 rounded-xl p-2 -mx-2 hover:bg-slate-50 transition"
+                >
+                  <span
+                    className={`w-6 h-6 rounded-lg font-mono text-xs font-bold flex items-center justify-center shrink-0 mt-0.5 ${
+                      idx === 0
+                        ? "bg-amber-100 text-amber-800"
+                        : idx === 1
+                        ? "bg-slate-200 text-slate-700"
+                        : "bg-slate-100 text-slate-500"
+                    }`}
+                  >
+                    {idx + 1}
                   </span>
-                  <div className="space-y-0.5 min-w-0">
-                    <Link
-                      href={`/blog/${post.slug}`}
-                      className="text-[13px] font-medium text-zinc-900 hover:underline line-clamp-2 block"
-                    >
+                  <div className="space-y-1 min-w-0">
+                    <div className="text-[13.5px] font-semibold text-slate-900 group-hover:text-indigo-600 transition line-clamp-2 leading-snug">
                       {post.title}
-                    </Link>
-                    <div className="text-[11px] text-zinc-400 font-mono">
-                      {post.views.toLocaleString()} views
+                    </div>
+                    <div className="flex items-center gap-2 text-[11.5px] text-slate-400">
+                      <span>{getCategoryLabel(post.categorySlug, categories)}</span>
+                      <span>·</span>
+                      <span>อ่าน {post.views.toLocaleString()} ครั้ง</span>
                     </div>
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
           </div>
 
-          {/* Categories Tree Widget */}
-          <div className="rounded-2xl border border-zinc-200/90 bg-white p-5 shadow-2xs space-y-3">
-            <div className="flex items-center gap-2 text-[13px] font-semibold text-zinc-900 border-b border-zinc-100 pb-3">
-              <Folder className="w-4 h-4 text-zinc-500" />
-              <span>หมวดหมู่ทั้งหมด</span>
+          {/* Categories Guide Widget */}
+          <div className="rounded-2xl border border-slate-200/90 bg-white p-5 shadow-2xs space-y-3.5">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div className="flex items-center gap-2 text-[14px] font-bold text-slate-900">
+                <Folder className="w-4 h-4 text-indigo-500" />
+                <span>เลือกอ่านตามหมวดหมู่</span>
+              </div>
+              <Link
+                href="/category"
+                className="text-[12px] font-medium text-indigo-600 hover:underline"
+              >
+                ดูทั้งหมด
+              </Link>
             </div>
 
-            <div className="flex flex-wrap gap-1.5 pt-1">
-              {categories.map((cat) => (
-                <Link
-                  key={cat.id}
-                  href={`/category/${cat.slug}`}
-                  className="rounded-lg border border-zinc-200 bg-zinc-50/70 px-2.5 py-1 text-[12px] text-zinc-700 hover:bg-zinc-900 hover:text-white hover:border-zinc-900 transition"
-                >
-                  {cat.name}
-                </Link>
-              ))}
+            <div className="space-y-2">
+              {categories.map((cat) => {
+                const count = posts.filter(
+                  (p) =>
+                    p.categorySlug === cat.slug ||
+                    p.categorySlug.startsWith(`${cat.slug}/`)
+                ).length;
+                return (
+                  <Link
+                    key={cat.id}
+                    href={`/category/${cat.slug}`}
+                    className="flex items-center justify-between rounded-xl border border-slate-100 bg-slate-50/70 hover:bg-indigo-50/60 hover:border-indigo-200 px-3.5 py-2.5 transition group"
+                  >
+                    <div>
+                      <div className="text-[13px] font-semibold text-slate-800 group-hover:text-indigo-700">
+                        {cat.name}
+                      </div>
+                      <div className="text-[11.5px] text-slate-500 line-clamp-1">
+                        {cat.description}
+                      </div>
+                    </div>
+                    <span className="rounded-full bg-white border border-slate-200 px-2.5 py-0.5 text-[11px] font-semibold text-slate-600 shrink-0">
+                      {count} บทความ
+                    </span>
+                  </Link>
+                );
+              })}
             </div>
+          </div>
+
+          {/* Quick Tip Card */}
+          <div className="rounded-2xl border border-indigo-100 bg-indigo-50/50 p-4 text-[12.5px] text-slate-600 space-y-1.5">
+            <div className="font-bold text-indigo-950 flex items-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
+              <span>เคล็ดลับการใช้งานไว</span>
+            </div>
+            <p className="leading-relaxed">
+              กดปุ่ม <kbd className="rounded bg-white border border-slate-200 px-1.5 py-0.5 font-mono text-[11px]">⌘K</kbd> หรือ <kbd className="rounded bg-white border border-slate-200 px-1.5 py-0.5 font-mono text-[11px]">Ctrl+K</kbd> ได้จากทุกหน้าเพื่อค้นหาบทความทันที หรือกดปุ่ม <strong>บันทึกไว้อ่าน</strong> เพื่อเก็บเข้าคลังส่วนตัวของคุณ
+            </p>
           </div>
         </aside>
       </div>
@@ -214,8 +226,8 @@ export default function ReaderHomePage() {
     <Suspense
       fallback={
         <div className="space-y-6">
-          <div className="h-36 rounded-2xl bg-zinc-200/60 animate-pulse" />
-          <div className="h-64 rounded-3xl bg-white border border-zinc-200 animate-pulse" />
+          <div className="h-64 rounded-3xl bg-white border border-slate-200 animate-pulse" />
+          <div className="h-96 rounded-2xl bg-white border border-slate-200 animate-pulse" />
         </div>
       }
     >
