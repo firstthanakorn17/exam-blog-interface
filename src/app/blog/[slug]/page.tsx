@@ -2,13 +2,11 @@ import { Suspense } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { draftMode } from "next/headers";
-import { after } from "next/server";
 import type { Metadata } from "next";
 import {
   getPublishedPosts,
   getPostBySlug,
   getReaderSettings,
-  incrementPostCounter,
 } from "@/lib/content";
 import {
   formatDate,
@@ -18,6 +16,7 @@ import {
   SharedMarkdownProse,
 } from "@examblog/shared";
 import { ClapButton } from "@/components/clap-button";
+import { ViewTracker } from "@/components/view-tracker";
 import { ArrowLeft, Clock, Eye, List } from "lucide-react";
 
 export async function generateStaticParams() {
@@ -94,17 +93,13 @@ async function ArticleReaderBody({
     notFound();
   }
 
-  // Non-blocking view increment via next/after
-  after(async () => {
-    await incrementPostCounter(slug, "increment_view");
-  });
-
   const stats = calculateReadingStats(post.content);
   const headings = extractHeadings(post.content);
   const jsonLd = buildBlogPostingJsonLd(post, settings);
 
   return (
     <article className="space-y-8">
+      <ViewTracker slug={post.slug} />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
