@@ -18,7 +18,7 @@ interface SharedStore {
 
 const SHARED_DB_FILE = path.resolve(
   process.cwd(),
-  "../exam-blog-nextjs/.data/blog-db.json"
+  "../exam-blog-console/.data/blog-db.json"
 );
 
 const COMMENTS_FILE = path.join(process.cwd(), ".data/comments.json");
