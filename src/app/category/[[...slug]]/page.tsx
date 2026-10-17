@@ -4,7 +4,7 @@ import {
   getPublishedPosts,
   getReaderCategories,
 } from "@/lib/content";
-import { formatDate, calculateReadingStats } from "@nextblog/shared";
+import { formatDate, calculateReadingStats } from "@examblog/shared";
 import { ChevronRight, Folder } from "lucide-react";
 
 async function CategoryArchiveContent({

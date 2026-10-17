@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { getPublishedPosts } from "@/lib/content";
-import { formatDate, calculateReadingStats } from "@nextblog/shared";
+import { formatDate, calculateReadingStats } from "@examblog/shared";
 
 export default async function FullSearchPage() {
   const posts = await getPublishedPosts(false);

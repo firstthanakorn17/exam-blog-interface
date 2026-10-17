@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import type { Post } from "@nextblog/shared";
+import type { Post } from "@examblog/shared";
 import { Search, X, ArrowRight } from "lucide-react";
 
 export function SearchModalClient({ posts }: { posts: Post[] }) {

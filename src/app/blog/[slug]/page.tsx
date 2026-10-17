@@ -16,7 +16,7 @@ import {
   extractHeadings,
   buildBlogPostingJsonLd,
   SharedMarkdownProse,
-} from "@nextblog/shared";
+} from "@examblog/shared";
 import { ClapButton } from "@/components/clap-button";
 import { ArrowLeft, Clock, Eye, List } from "lucide-react";
 

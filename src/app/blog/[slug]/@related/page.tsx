@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import { getPublishedPosts } from "@/lib/content";
-import { calculateReadingStats } from "@nextblog/shared";
+import { calculateReadingStats } from "@examblog/shared";
 import { Sparkles } from "lucide-react";
 
 async function RelatedSlotContent({

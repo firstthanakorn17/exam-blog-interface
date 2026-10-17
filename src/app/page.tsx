@@ -6,7 +6,7 @@ import {
   getReaderCategories,
   getReaderSettings,
 } from "@/lib/content";
-import { formatDate, calculateReadingStats } from "@nextblog/shared";
+import { formatDate, calculateReadingStats } from "@examblog/shared";
 import { ArrowRight, Flame, Eye, Clock, Folder } from "lucide-react";
 
 async function HomeFeedContent() {

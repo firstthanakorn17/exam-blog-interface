@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import { getCommentsBySlug } from "@/lib/content";
-import { formatDate } from "@nextblog/shared";
+import { formatDate } from "@examblog/shared";
 import { CommentForm } from "@/components/comment-form";
 import { MessageSquare } from "lucide-react";
 

@@ -1,5 +1,5 @@
 {
-  "name": "exam-blog-reader",
+  "name": "exam-blog-interface",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -9,7 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "@nextblog/shared": "file:../nextblog-shared",
+    "@examblog/shared": "file:../nextblog-shared",
     "clsx": "^2.1.1",
     "lucide-react": "^1.16.0",
     "next": "16.4.2",

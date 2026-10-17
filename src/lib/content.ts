@@ -7,7 +7,7 @@ import type {
   Category,
   CommentItem,
   SiteSettings,
-} from "@nextblog/shared";
+} from "@examblog/shared";
 
 interface SharedStore {
   posts: Post[];
