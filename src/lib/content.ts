@@ -16,6 +16,9 @@ interface SharedStore {
   comments?: CommentItem[];
 }
 
+const GO_API_BASE =
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api/v1";
+
 const SHARED_DB_FILE = path.resolve(
   process.cwd(),
   "../exam-blog-console/.data/blog-db.json"
@@ -41,6 +44,20 @@ const DEFAULT_COMMENTS: CommentItem[] = [
 ];
 
 export async function readSharedDb(): Promise<SharedStore> {
+  // 1. Primary: Go Fiber Backend API (exam-blog-api :4000)
+  try {
+    const res = await fetch(`${GO_API_BASE}/content?all=1`, {
+      cache: "no-store",
+      signal: AbortSignal.timeout(1500),
+    });
+    if (res.ok) {
+      return (await res.json()) as SharedStore;
+    }
+  } catch {
+    // Fallback if Go API is offline during static build
+  }
+
+  // 2. Fallback: Shared local JSON store
   try {
     const raw = await fs.readFile(SHARED_DB_FILE, "utf-8");
     return JSON.parse(raw) as SharedStore;
@@ -106,6 +123,24 @@ export async function getCommentsBySlug(slug: string): Promise<CommentItem[]> {
   cacheTag("comments", `comments-${slug}`);
 
   try {
+    const res = await fetch(
+      `${GO_API_BASE}/comments?slug=${encodeURIComponent(slug)}`,
+      {
+        cache: "no-store",
+        signal: AbortSignal.timeout(1500),
+      }
+    );
+    if (res.ok) {
+      const data = (await res.json()) as { comments?: CommentItem[] };
+      if (Array.isArray(data.comments)) {
+        return data.comments;
+      }
+    }
+  } catch {
+    // fallback to local comments file
+  }
+
+  try {
     const raw = await fs.readFile(COMMENTS_FILE, "utf-8");
     const all = JSON.parse(raw) as CommentItem[];
     return all.filter((c) => c.postSlug === slug);
@@ -121,6 +156,18 @@ export async function getCommentsBySlug(slug: string): Promise<CommentItem[]> {
 }
 
 export async function appendComment(item: CommentItem): Promise<void> {
+  try {
+    const res = await fetch(`${GO_API_BASE}/comments`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(item),
+      signal: AbortSignal.timeout(1500),
+    });
+    if (res.ok) return;
+  } catch {
+    // fallback to local file
+  }
+
   let all: CommentItem[] = DEFAULT_COMMENTS;
   try {
     const raw = await fs.readFile(COMMENTS_FILE, "utf-8");
@@ -137,6 +184,21 @@ export async function incrementPostCounter(
   slug: string,
   type: "increment_view" | "clap"
 ): Promise<void> {
+  const endpoint =
+    type === "clap"
+      ? `${GO_API_BASE}/posts/${encodeURIComponent(slug)}/clap`
+      : `${GO_API_BASE}/posts/${encodeURIComponent(slug)}/view`;
+
+  try {
+    const res = await fetch(endpoint, {
+      method: "POST",
+      signal: AbortSignal.timeout(1500),
+    });
+    if (res.ok) return;
+  } catch {
+    // fallback if Go API offline
+  }
+
   try {
     const raw = await fs.readFile(SHARED_DB_FILE, "utf-8");
     const db = JSON.parse(raw) as SharedStore;
@@ -150,6 +212,6 @@ export async function incrementPostCounter(
       await fs.writeFile(SHARED_DB_FILE, JSON.stringify(db, null, 2), "utf-8");
     }
   } catch {
-    // fallback if file locked
+    // ignore
   }
 }
