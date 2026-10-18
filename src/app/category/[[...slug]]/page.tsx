@@ -1,11 +1,71 @@
 import { Suspense } from "react";
 import Link from "next/link";
+import type { Metadata } from "next";
 import {
   getPublishedPosts,
   getReaderCategories,
+  getReaderSettings,
 } from "@/lib/content";
+import { buildCategoryJsonLd } from "@examblog/shared";
 import { HomeFeedExplorer } from "@/components/home-feed-explorer";
 import { ChevronRight, Folder, Compass } from "lucide-react";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug?: string[] }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const activeSlug = slug && slug.length > 0 ? slug.join("/") : "";
+
+  const [categories, settings] = await Promise.all([
+    getReaderCategories(),
+    getReaderSettings(),
+  ]);
+
+  const baseUrl = (settings.siteUrl || "http://localhost:3002").replace(
+    /\/$/,
+    ""
+  );
+  const currentCategory = categories.find((c) => c.slug === activeSlug);
+  const title = currentCategory
+    ? `${currentCategory.name} — รวมบทความและคู่มือเชิงลึก`
+    : "สารบัญหมวดหมู่บทความทั้งหมด";
+  const description = currentCategory
+    ? `${currentCategory.description} — อัปเดตบทความเทคนิคและสถาปัตยกรรมระบบล่าสุดในหมวด ${currentCategory.name}`
+    : settings.defaultSeoDescription;
+  const canonicalUrl = activeSlug
+    ? `${baseUrl}/category/${activeSlug}`
+    : `${baseUrl}/category`;
+
+  return {
+    title,
+    description,
+    keywords: [
+      currentCategory?.name || "หมวดหมู่บทความ",
+      activeSlug || "technology",
+      settings.siteName,
+      "Next.js 16",
+      "React 19",
+    ],
+    alternates: {
+      canonical: canonicalUrl,
+    },
+    openGraph: {
+      title,
+      description,
+      url: canonicalUrl,
+      siteName: settings.siteName,
+      locale: "th_TH",
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+    },
+  };
+}
 
 async function CategoryArchiveContent({
   params,
@@ -15,18 +75,41 @@ async function CategoryArchiveContent({
   const { slug } = await params;
   const activeSlug = slug && slug.length > 0 ? slug.join("/") : "";
 
-  const [posts, categories] = await Promise.all([
+  const [posts, categories, settings] = await Promise.all([
     getPublishedPosts(false),
     getReaderCategories(),
+    getReaderSettings(),
   ]);
 
   const currentCategory = categories.find((c) => c.slug === activeSlug);
   const subCategories = categories.filter(
     (c) => c.parentSlug === (activeSlug || null)
   );
+  const matchingPosts = activeSlug
+    ? posts.filter(
+        (p) =>
+          p.categorySlug === activeSlug ||
+          p.categorySlug.startsWith(`${activeSlug}/`)
+      )
+    : posts;
+
+  const categoryJsonLd = buildCategoryJsonLd(
+    currentCategory ? currentCategory.name : "หมวดหมู่บทความทั้งหมด",
+    activeSlug,
+    currentCategory
+      ? currentCategory.description
+      : settings.defaultSeoDescription,
+    matchingPosts,
+    settings
+  );
 
   return (
     <div className="space-y-8">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(categoryJsonLd) }}
+      />
+
       {/* Friendly Breadcrumb */}
       <nav
         aria-label="Breadcrumb"

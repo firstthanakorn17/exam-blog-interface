@@ -6,7 +6,11 @@ import {
   getReaderCategories,
   getReaderSettings,
 } from "@/lib/content";
-import { formatDate, calculateReadingStats } from "@examblog/shared";
+import {
+  formatDate,
+  calculateReadingStats,
+  buildWebSiteJsonLd,
+} from "@examblog/shared";
 import { HomeFeedExplorer } from "@/components/home-feed-explorer";
 import { getCategoryLabel } from "@/lib/category-utils";
 import { BookmarkButton } from "@/components/bookmarks-provider";
@@ -30,9 +34,14 @@ async function HomeFeedContent() {
 
   const featuredPost = posts.find((p) => p.featured) || posts[0];
   const trending = [...posts].sort((a, b) => b.views - a.views).slice(0, 4);
+  const websiteJsonLd = buildWebSiteJsonLd(settings, posts);
 
   return (
     <div className="space-y-10">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
+      />
       {/* Featured Hero Story Card */}
       {featuredPost && (
         <section className="relative overflow-hidden rounded-3xl border border-indigo-100 bg-gradient-to-br from-white via-indigo-50/35 to-violet-50/40 p-6 sm:p-10 shadow-xs">

@@ -12,17 +12,31 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     getReaderSettings(),
   ]);
 
-  const baseUrl = (settings.siteUrl || "https://nextblog.example.com").replace(
+  const baseUrl = (settings.siteUrl || "http://localhost:3002").replace(
     /\/$/,
     ""
   );
+  const latestPostDate =
+    posts.length > 0 ? new Date(posts[0].updatedAt) : new Date("2026-10-18T00:00:00.000Z");
 
   return [
     {
       url: baseUrl,
-      lastModified: new Date(),
+      lastModified: latestPostDate,
       changeFrequency: "daily",
-      priority: 1,
+      priority: 1.0,
+    },
+    {
+      url: `${baseUrl}/category`,
+      lastModified: latestPostDate,
+      changeFrequency: "weekly",
+      priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/search`,
+      lastModified: latestPostDate,
+      changeFrequency: "weekly",
+      priority: 0.7,
     },
     ...posts
       .filter((p) => !p.noIndex)
@@ -30,13 +44,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         url: p.canonicalUrl || `${baseUrl}/blog/${p.slug}`,
         lastModified: new Date(p.updatedAt),
         changeFrequency: "weekly" as const,
-        priority: p.featured ? 0.9 : 0.7,
+        priority: p.featured ? 0.95 : 0.85,
       })),
     ...categories.map((c) => ({
       url: `${baseUrl}/category/${c.slug}`,
-      lastModified: new Date(),
+      lastModified: latestPostDate,
       changeFrequency: "weekly" as const,
-      priority: 0.6,
+      priority: 0.75,
     })),
   ];
 }

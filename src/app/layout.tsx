@@ -15,18 +15,68 @@ import "./globals.css";
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getReaderSettings();
+  const siteUrl = (settings.siteUrl || "http://localhost:3002").replace(
+    /\/$/,
+    ""
+  );
+
   return {
-    metadataBase: new URL(settings.siteUrl || "http://localhost:3002"),
+    metadataBase: new URL(siteUrl),
     title: {
       default: `${settings.siteName} — ${settings.tagline}`,
       template: `%s | ${settings.siteName}`,
     },
     description: settings.defaultSeoDescription,
+    applicationName: settings.siteName,
+    category: "technology",
+    keywords: [
+      settings.siteName,
+      "Next.js 16",
+      "App Router",
+      "React 19",
+      "Go Fiber",
+      "PostgreSQL",
+      "Redis",
+      "Technical Blog",
+      "วิศวกรรมซอฟต์แวร์",
+      "สถาปัตยกรรมระบบ",
+    ],
     alternates: {
+      canonical: "/",
+      languages: {
+        "th-TH": "/",
+      },
       types: {
-        "application/rss+xml": "/rss.xml",
+        "application/rss+xml": `${siteUrl}/rss.xml`,
       },
     },
+    openGraph: {
+      type: "website",
+      locale: "th_TH",
+      url: siteUrl,
+      siteName: settings.siteName,
+      title: `${settings.siteName} — ${settings.tagline}`,
+      description: settings.defaultSeoDescription,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${settings.siteName} — ${settings.tagline}`,
+      description: settings.defaultSeoDescription,
+      creator: settings.twitterHandle || "@nextblog",
+    },
+    robots: settings.maintenanceMode
+      ? { index: false, follow: false }
+      : {
+          index: true,
+          follow: true,
+          googleBot: {
+            index: true,
+            follow: true,
+            "max-video-preview": -1,
+            "max-image-preview": "large",
+            "max-snippet": -1,
+          },
+        },
   };
 }
 
