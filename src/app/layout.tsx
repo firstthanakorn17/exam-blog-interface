@@ -10,6 +10,7 @@ import {
 } from "@/lib/content";
 import { BookmarksProvider } from "@/components/bookmarks-provider";
 import { ReaderHeader } from "@/components/reader-header";
+import { WebVitalsHud } from "@/components/web-vitals-hud";
 import { Eye, BookOpen, Rss, Map, ShieldCheck } from "lucide-react";
 import "./globals.css";
 
@@ -146,6 +147,18 @@ export default async function ReaderRootLayout({
               </div>
 
               <div className="flex flex-wrap items-center gap-4 text-[12.5px] font-medium text-slate-600">
+                <Link href="/practice" className="hover:text-indigo-600 transition">
+                  จำลองสอบจับเวลา
+                </Link>
+                <Link href="/calendar" className="hover:text-indigo-600 transition">
+                  ปฏิทินสอบ
+                </Link>
+                <Link href="/calculator" className="hover:text-indigo-600 transition">
+                  คำนวณคะแนน
+                </Link>
+                <Link href="/vault" className="hover:text-indigo-600 transition">
+                  คลังข้อสอบ VIP
+                </Link>
                 <Link href="/search" className="hover:text-indigo-600 transition">
                   ค้นหาทั้งหมด
                 </Link>
@@ -178,6 +191,7 @@ export default async function ReaderRootLayout({
           </footer>
         </BookmarksProvider>
 
+        <WebVitalsHud />
         <Toaster richColors position="bottom-right" theme="light" />
       </body>
     </html>

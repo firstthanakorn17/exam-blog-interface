@@ -58,3 +58,36 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
 }
+
+/* Defer rendering heavy below-the-fold cards (modern-web-guidance: defer-rendering-heavy-content) */
+.defer-offscreen-card {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 260px;
+}
+
+/* Validate input only after user interaction (modern-web-guidance: validate-input-after-interaction) */
+.field-error-msg {
+  display: none;
+}
+
+.validated-input:user-invalid,
+.validated-input.user-invalid-fallback {
+  border-color: #dc2626;
+  background-color: #fef2f2;
+}
+
+.validated-input:user-invalid + .field-error-msg,
+.validated-input.user-invalid-fallback + .field-error-msg {
+  display: flex;
+}
+
+.validated-input:user-valid,
+.validated-input.user-valid-fallback {
+  border-color: #16a34a;
+}
+
+.validated-field:has(.validated-input:user-invalid) .field-rules {
+  color: #dc2626;
+  font-weight: 600;
+}
+

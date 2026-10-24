@@ -4,6 +4,11 @@ const nextConfig: NextConfig = {
   cacheComponents: true,
   partialPrefetching: true,
   transpilePackages: ["@examblog/shared"],
+  experimental: {
+    authInterrupts: true,
+    useOffline: true,
+  },
 };
 
 export default nextConfig;
+
